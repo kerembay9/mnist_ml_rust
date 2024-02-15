@@ -43,3 +43,15 @@ pub fn softmax(input: Array2<f64>) -> Array2<f64> {
     let exp_sum: f64 = input.map(|&x| f64::exp(x)).sum();
     input.map(|&x| f64::exp(x) / exp_sum)
 }
+
+pub fn one_hot_encode(labels: &[usize]) -> Array2<f64> {
+    let num_labels = labels.iter().cloned().max().map_or(0, |max_label| max_label + 1);
+
+    let one_hot_encoded: Vec<_> = labels.iter().map(|&label| {
+        let mut one_hot = vec![0.0; num_labels];
+        one_hot[label] = 1.0;
+        one_hot
+    }).collect();
+
+    Array2::from_shape_vec((labels.len(), num_labels), one_hot_encoded.concat()).unwrap()
+}
