@@ -4,7 +4,6 @@ use crate::utils::{softmax, one_hot, relu, deriv_relu, get_predictions, get_accu
 #[cfg(test)]
 mod tests {
     use ndarray::{arr1, arr2};
-
     // Import necessary items from the outer module
     use super::*;
     #[test]
@@ -13,8 +12,8 @@ mod tests {
         let input_array = array![[1.0, 2.0, 3.0], [2.0, 2.0, 2.0]];
 
         // Act
-        let result = softmax(&input_array);
-        //println!("{:?}",result);
+        let result = softmax(&input_array).t().into_owned();
+
         // Assert
         // Check that the sum of each row in the result is close to 1.0
         for row in result.outer_iter() {
@@ -29,7 +28,6 @@ mod tests {
         // Act
         let result = one_hot(&input_array);
 
-        //println!("{:?}", result);
         // Assert
         // Check that each row has only one element set to 1.0, and the rest are 0.0
         for row in result.t().outer_iter() {
@@ -45,7 +43,6 @@ mod tests {
         // Act
         let result = relu(&input_array);
 
-        //println!("{:?}",result);
         // Assert
         // Check that each element in the result is greater than or equal to 0.0
         for &x in result.iter() {
@@ -60,8 +57,6 @@ mod tests {
 
         // Act
         let result = deriv_relu(&input_array);
-
-        //println!("{:?}",result);
 
         // Assert
         // Check that each element in the result is either 0.0 or 1.0
@@ -102,9 +97,9 @@ mod tests {
     fn test_forward_prop() {
         // Arrange
         let w1 = arr2(&[[-10.0], [2.0]]);
-        let b1 = arr2(&[[5.0], [6.0]]);
+        let b1 = arr1(&[5.0 ,6.0]);
         let w2 = arr2(&[[1.0, 2.0], [3.0, 4.0]]);
-        let b2 = arr2(&[[5.0], [6.0]]);
+        let b2 = arr1(&[5.0 ,6.0]);
         let inp = arr2(&[[3.0, 4.0]]);
 
         // Act
@@ -120,26 +115,27 @@ mod tests {
     #[test]
     fn test_update_params() {
         let mut w1 = arr2(&[[1.0, 2.0, 3.0], [2.0, 4.0, 6.0], [3.0, 6.0, 9.0]]);
-        let mut b1 = arr2(&[[1.0], [2.0], [3.0]]);
+        let mut b1 = arr1(&[1.0, 2.0, 3.0]);
         let mut w2 = arr2(&[[0.5, 1.0, 1.5]]);
-        let mut b2 = arr2(&[[0.5]]);
+        let mut b2 = arr1(&[0.5]);
         let dw1 = arr2(&[[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]]);
-        let db1 = arr1(&[0.1, 0.2, 0.3]);
+        let db1 = 0.6;
         let dw2 = arr2(&[[0.1, 0.2, 0.3]]);
-        let db2 = arr1(&[0.1]);
+        let db2 = 0.1;
 
         let alpha = 1.0;
 
-        update_params(&mut w1, &mut b1, &mut w2, &mut b2, &dw1, &db1, &dw2, &db2, alpha);
+        update_params(&mut w1, &mut b1, &mut w2, &mut b2, &dw1, db1, &dw2, db2, alpha);
 
         let expected_w1 = arr2(&[[0.9, 1.8, 2.7],[1.6, 3.5, 5.4],[2.3, 5.2, 8.1]]);
-        let expected_b1 = arr2(&[[0.9], [1.8], [2.7]]);
+        let expected_b1 = arr1(&[0.4, 1.4, 2.4]);
         let expected_w2 = arr2(&[[0.4, 0.8, 1.2]]);
-        let expected_b2 = arr2(&[[0.4]]);
+        let expected_b2 = arr1(&[0.4]);
 
         assert_eq!(w1, expected_w1);
         assert_eq!(b1, expected_b1);
         assert_eq!(w2, expected_w2);
         assert_eq!(b2, expected_b2);
     }
+    
 }
