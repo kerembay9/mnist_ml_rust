@@ -9,6 +9,8 @@ use ndarray::{Array1,Array2,s};
 #[cfg(test)]
 mod tests;
 fn main() {
+     use std::time::Instant;
+     let now = Instant::now();
      // Load the data and preprocess
      
      //Train set
@@ -32,7 +34,10 @@ fn main() {
 
      let accuracy =  get_accuracy(&predictions, &y_test);
 
-     println!("accuracy is {:.2}%", accuracy*100.0);
+     println!("Test accuracy is {:.2}%", accuracy*100.0);
+
+     let elapsed = now.elapsed();
+     println!("Elapsed: {:.2?}", elapsed);
 }
 
 
